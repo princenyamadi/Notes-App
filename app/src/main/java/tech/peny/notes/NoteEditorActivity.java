@@ -2,14 +2,19 @@ package tech.peny.notes;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+import java.util.HashSet;
+
 public class NoteEditorActivity extends AppCompatActivity {
     int noteId;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +43,12 @@ public class NoteEditorActivity extends AppCompatActivity {
                 MainActivity.notes.set(noteId,String.valueOf(s));
 
                 MainActivity.arrayAdapter.notifyDataSetChanged();
+                sharedPreferences = getApplicationContext().getSharedPreferences("tech.peny.notes", Context.MODE_PRIVATE);
+                HashSet<String> set  = new HashSet<>(MainActivity.notes);
+
+                sharedPreferences.edit().putStringSet("notes",set).apply();
+
+
             }
 
             @Override

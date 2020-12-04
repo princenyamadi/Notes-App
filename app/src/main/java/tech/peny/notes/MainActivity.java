@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,9 +18,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
+    SharedPreferences sharedPreferences
     static ArrayList<String> notes = new ArrayList<>();
     static  ArrayAdapter arrayAdapter;
     @Override
@@ -28,9 +32,18 @@ public class MainActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.listView);
         notes.add("Example Note");
-
+       sharedPreferences = getApplicationContext().getSharedPreferences("tech.peny.notes", Context.MODE_PRIVATE);
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,notes);
         listView.setAdapter(arrayAdapter);
+        HashSet<String> set = (HashSet<String>) sharedPreferences.getStringSet("notes",null);
+
+        if(set == null){
+            notes.add("Example note");
+
+        }else{
+            notes = new ArrayList(set);
+        }
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -55,9 +68,20 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                             notes.remove(noteToDel);
                             arrayAdapter.notifyDataSetChanged();
+
+
+                                HashSet<String> set  = new HashSet<>(MainActivity.notes);
+
+                                sharedPreferences.edit().putStringSet("notes",set).apply();
                             }
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+
+                            }
+                        })
                         .show();
 
 
